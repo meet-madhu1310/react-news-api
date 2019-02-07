@@ -1,28 +1,63 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+
+import MainNews from './components/MainNews'
+import Form from './components/Form'
+import Title from './components/Title'
+import MenuBar from './components/MenuBar'
+
 import './App.css';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
-}
+const API_KEY = 'a140d9f145774014b3b364de40d68d54'
 
-export default App;
+class App extends Component {
+
+  state = {
+    articles: []
+  }
+
+  getNews = async (event) => {
+    event.preventDefault()
+    console.log(this.state)
+
+    const country = event.target.elements.country.value
+
+    const url = `https://newsapi.org/v2/top-headlines?` + `country=${country}&` + `apiKey=${API_KEY}`
+
+    //wait for url to fetch the information
+    fetch(url)
+      .then(data => data.json())
+        .then(data => {
+          this.setState({
+            articles: data.articles
+          })
+        })
+  }
+
+  render() {
+
+    return (
+      <div className='main'>
+
+          <Title />
+          <Form
+            getNews={this.getNews}
+          />
+          <MenuBar />
+          {this.state.articles.slice(0, 5).map((article, i) => {
+            return (
+              <MainNews
+                key={i}
+                author={article.author}
+                title={article.title}
+                description={article.description}
+                image={article.urlToImage}
+              />
+            )
+          })}
+
+      </div>
+    )
+  }
+
+}
+export default App
